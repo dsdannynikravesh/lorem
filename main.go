@@ -10,7 +10,7 @@ import (
 
 func main() {
 	numberOfParagraphs := 1
-	if len(os.Args) > 2 {
+	if len(os.Args) > 1 {
 		n, err := strconv.Atoi(os.Args[1])
 		if err != nil {
 			fmt.Fprintln(os.Stderr, "invalid number:", err)
@@ -19,8 +19,6 @@ func main() {
 		numberOfParagraphs = n
 
 	}
-
-	fmt.Println(numberOfParagraphs)
 
 	lorem := getLorem(numberOfParagraphs)
 
@@ -39,9 +37,12 @@ func getLorem(n int) string {
 	case 1:
 		return lorem
 	default:
-		for range n {
+		for i := range n {
 			b.WriteString(lorem)
-			b.WriteString("\n")
+			if i != n-1 {
+				b.WriteString("\n")
+				b.WriteString("\n")
+			}
 		}
 	}
 
