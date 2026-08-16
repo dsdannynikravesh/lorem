@@ -1,17 +1,22 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"os"
-	"os/exec"
 	"strconv"
 	"strings"
+
+	"github.com/atotto/clipboard"
 )
 
 func main() {
+	clip := flag.Bool("c", false, "copy output to clipboard")
+	flag.Parse()
+
 	numberOfParagraphs := 1
-	if len(os.Args) > 1 {
-		n, err := strconv.Atoi(os.Args[1])
+	if len(flag.Args()) > 0 {
+		n, err := strconv.Atoi(flag.Args()[0])
 		if err != nil {
 			fmt.Fprintln(os.Stderr, "invalid number:", err)
 			os.Exit(1)
@@ -22,12 +27,16 @@ func main() {
 
 	lorem := getLorem(numberOfParagraphs)
 
-	err := copyToClipboard(lorem)
-	if err != nil {
-		fmt.Fprintln(os.Stderr, "could not copy to clipboard:", err)
-	}
+	if *clip {
+		err := copyToClipboard(lorem)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, "could not copy to clipboard:", err)
+		}
 
-	fmt.Println(getLorem(numberOfParagraphs))
+		fmt.Println("Copied to clipboard")
+	} else {
+		fmt.Println(lorem)
+	}
 }
 
 func getLorem(n int) string {
@@ -50,8 +59,5 @@ func getLorem(n int) string {
 }
 
 func copyToClipboard(text string) error {
-	cmd := exec.Command("wl-copy")
-	cmd.Stdin = strings.NewReader(text)
-
-	return cmd.Run()
+	return clipboard.WriteAll(text)
 }
